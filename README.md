@@ -88,6 +88,76 @@ connects to the content interface slot the Docker snap defines. We make the
 content shared by the Docker snap available in `$SNAP/docker-bin` to keep it
 separated from the content of our own snap.
 
+### Using docker-compose
+
+If we wanted to run a Docker container managing a webserver, we only need to
+extend our snap a small amount:
+
+```
+ticker:
+    command: usr/bin/ticker
+    daemon: simple
+    plugs:
+      - docker
+
+parts:
+  {snip}
+    organize:
+      tocker_run.sh: usr/bin/tocker
+      tocker_compose.sh: usr/bin/ticker
+      docker-compose.yml: usr/share/composers/hello-nginx.yml
+      compositions: usr/share/composers/compositions
+
+
+Our src directory now looks like:
+$ tree ./src
+src/
+├── compositions
+│   └── index.html
+├── docker-compose.yml
+├── tocker_compose.sh
+└── tocker_run.sh
+
+1 directory, 4 files
+
+$ cat src/tocker_compose.sh
+#!/bin/sh
+
+export PATH=$SNAP/docker-bin/bin:$PATH
+export PYTHONPATH=$SNAP/docker-bin/lib/python3.6/site-packages:$PYTHONPATH
+docker-compose -f $SNAP/usr/share/composers/hello-nginx.yml up
+
+$ cat src/docker-compose.yml
+version: '3'
+
+services:
+  client:
+    image: nginx
+    ports:
+      - 8000:80
+    volumes:
+      - $SNAP/usr/share/composers/compositions:/usr/share/nginx/html
+
+$ cat src/compositions/index.html
+"Hello world!"
+```
+
+First, add a new app to our `apps:` section. This app will actually be a `simple
+daemon` (see [here](https://snapcraft.io/docs/services-and-daemons) for other
+options). Our daemon will be brought up immediately when our snap is installed,
+and it will continue to run in the background until we stop it.
+
+Next we extend our `parts:` section to include the script that will be run by
+the `simple daemon` `ticker`, along with the `docker-compose.yml` and the
+content of our webserver.
+
+Add the relevant directories and files to our `src/` tree so that everything we
+need ends up in the right places, and finally after rebuilding our snap and
+installing it, the interfaces we connected earlier will still be connected, and
+`snap` will automatically start our `simple daemon`. If you open a web browser and
+navigate to http://localhost:8000, you should be greeted with the website hosted
+by our Docker container!
+
 
 ___
 Currently under construction.
