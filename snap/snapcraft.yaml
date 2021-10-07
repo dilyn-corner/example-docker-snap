@@ -1,6 +1,6 @@
 name: tocker
 base: core20
-version: '1.0'
+version: '2.0'
 summary: A test of interacting with the Docker snap through another snap
 description: |
   This snap demonstrates how to move a Docker-based workflow to a snap'd
@@ -16,6 +16,11 @@ apps:
     command: usr/bin/tocker
     plugs:
       - docker
+  ticker:
+    command: usr/bin/ticker
+    daemon: simple
+    plugs:
+      - docker
 
 parts:
   copy-script:
@@ -23,6 +28,9 @@ parts:
     source: src/
     organize:
       tocker_run.sh: usr/bin/tocker
+      tocker_compose.sh: usr/bin/ticker
+      docker-compose.yml: usr/share/composers/hello-nginx.yml
+      compositions: usr/share/composers/compositions
 
 plugs:
   docker-executables:
