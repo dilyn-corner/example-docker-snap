@@ -6,7 +6,7 @@ description: |
   This snap demonstrates how to move a Docker-based workflow to a snap'd
   environment on Ubuntu Core. This snap shows how one would interact with the
   docker snap, namely through a content sharing interface to gain access to the
-  docker executable, along with a simple script to call the docker executable.
+  docker executable, along with simple scripts to make use of Docker.
 
 grade: stable
 confinement: strict
