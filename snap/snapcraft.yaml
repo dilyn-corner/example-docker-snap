@@ -1,0 +1,31 @@
+name: tocker
+base: core20
+version: '1.0'
+summary: A test of interacting with the Docker snap through another snap
+description: |
+  This snap demonstrates how to move a Docker-based workflow to a snap'd
+  environment on Ubuntu Core. This snap shows how one would interact with the
+  docker snap, namely through a content sharing interface to gain access to the
+  docker executable, along with a simple script to call the docker executable.
+
+grade: stable
+confinement: strict
+
+apps:
+  tocker:
+    command: usr/bin/tocker
+    plugs:
+      - docker
+
+parts:
+  copy-script:
+    plugin: dump
+    source: src/
+    organize:
+      tocker_run.sh: usr/bin/tocker
+
+plugs:
+  docker-executables:
+    interface: content
+    content: executables
+    target: $SNAP/docker-bin
