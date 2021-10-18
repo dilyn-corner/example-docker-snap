@@ -14,7 +14,7 @@ You'll need `git`, `snap`, and `snapcraft`, along with the `docker` snap.
 $ git clone https://github.com/dilyn-corner/example-docker-snap
 $ cd example-docker-snap
 $ snapcraft
-$ snap install --dangerous ./tocker_2.0_amd64.snap
+$ snap install --dangerous ./tocker_*_amd64.snap
 ```
 
 Then, simply connect the interfaces and run the snap.
@@ -38,26 +38,24 @@ base: core20
 version: '0.1'
 summary: A test of interacting with the Docker snap through another snap
 description: |
-  This snap demonstrates how to move a Docker-based workflow to a snap'd
-  environment on Ubuntu Core. This snap shows how one would interact with the
-  docker snap, namely through a content sharing interface to gain access to the
-  docker executable, along with a simple script to call the docker executable.
+  This snap moves a Docker-based workflow to a snap'd environment on Ubuntu
+  Core. This snap shows how one would interact with the docker snap, namely
+  through a content sharing interface to gain access to the docker executable,
+  along with a simple script to call the docker executable.
 
 grade: stable
 confinement: strict
 
 apps:
   tocker:
-    command: usr/bin/tocker
+    command: usr/bin/tocker_run.sh
     plugs:
       - docker
 
 parts:
   copy-script:
     plugin: dump
-    source: src
-    organize:
-      tocker_run.sh: usr/bin/tocker
+    source: src/
 
 plugs:
   docker-executables:
@@ -80,8 +78,8 @@ documentation](https://snapcraft.io/docs/docker-interface). Note that neither of
 the interfaces we'll be usingn are auto-connecting.
 
 The application itself is defined by a parts section; here we use the dump
-plugin to move our tocker-run script from the src/ directory into our snap,
-specifically placing it in usr/bin/tocker.
+plugin to move our `tocker-run` script from the `src/usr/bin/` directory into
+our snap.
 
 Finally, we need another plug; this plug is a content interface plug, which
 connects to the content interface slot the Docker snap defines. We make the
@@ -94,40 +92,37 @@ If we wanted to run a Docker container managing a webserver, we only need to
 extend our snap a small amount:
 
 ```
-ticker:
-    command: usr/bin/ticker
-    daemon: simple
-    plugs:
-      - docker
-
-parts:
+apps:
   {snip}
-    organize:
-      tocker_run.sh: usr/bin/tocker
-      tocker_compose.sh: usr/bin/ticker
-      docker-compose.yml: usr/share/composers/hello-nginx.yml
-      compositions: usr/share/composers/compositions
-
+  ticker:
+      command: usr/bin/tocker_compose.sh
+      daemon: simple
+      plugs:
+        - docker
 
 Our src directory now looks like:
 $ tree ./src
-src/
-├── compositions
-│   └── index.html
-├── docker-compose.yml
-├── tocker_compose.sh
-└── tocker_run.sh
+./src
+└── usr
+    ├── bin
+    │   ├── tocker_compose.sh
+    │   ├── tocker_run.sh
+    └── share
+        └── composers
+            ├── compositions
+            │   └── index.html
+            └── nginx-compose.yml
 
-1 directory, 4 files
+5 directories, 8 files
 
-$ cat src/tocker_compose.sh
+$ cat src/usr/bin/tocker_compose.sh
 #!/bin/sh
 
 export PATH=$SNAP/docker-bin/bin:$PATH
 export PYTHONPATH=$SNAP/docker-bin/lib/python3.6/site-packages:$PYTHONPATH
 docker-compose -f $SNAP/usr/share/composers/hello-nginx.yml up
 
-$ cat src/docker-compose.yml
+$ cat src/usr/share/composers/docker-compose.yml
 version: '3'
 
 services:
@@ -138,7 +133,7 @@ services:
     volumes:
       - $SNAP/usr/share/composers/compositions:/usr/share/nginx/html
 
-$ cat src/compositions/index.html
+$ cat src/usr/share/compositions/index.html
 "Hello world!"
 ```
 

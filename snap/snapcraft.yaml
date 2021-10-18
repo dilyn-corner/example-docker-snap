@@ -1,23 +1,23 @@
 name: tocker
 base: core20
-version: '2.0'
+version: '2.5'
 summary: A test of interacting with the Docker snap through another snap
 description: |
-  This snap demonstrates how to move a Docker-based workflow to a snap'd
-  environment on Ubuntu Core. This snap shows how one would interact with the
-  docker snap, namely through a content sharing interface to gain access to the
-  docker executable, along with simple scripts to make use of Docker.
+  This snap moves a Docker-based workflow to a snap'd environment on Ubuntu
+  Core. This snap shows how one would interact with the docker snap, namely
+  through a content sharing interface to gain access to the docker executable,
+  along with simple scripts to make use of Docker.
 
 grade: stable
 confinement: strict
 
 apps:
   tocker:
-    command: usr/bin/tocker
+    command: usr/bin/tocker_run.sh
     plugs:
       - docker
   ticker:
-    command: usr/bin/ticker
+    command: usr/bin/tocker_compose.sh
     daemon: simple
     plugs:
       - docker
@@ -26,11 +26,6 @@ parts:
   copy-script:
     plugin: dump
     source: src/
-    organize:
-      tocker_run.sh: usr/bin/tocker
-      tocker_compose.sh: usr/bin/ticker
-      docker-compose.yml: usr/share/composers/hello-nginx.yml
-      compositions: usr/share/composers/compositions
 
 plugs:
   docker-executables:
