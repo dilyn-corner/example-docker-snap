@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export PATH="/docker-bin/bin:$PATH"
+export PATH="$SNAP/docker-bin/bin:$PATH"
 
 docker run --name tocker-jenkins2 \
     -v jenkins-vol:/var/jenkins_home \
