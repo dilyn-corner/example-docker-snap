@@ -21,8 +21,12 @@ apps:
     daemon: simple
     plugs:
       - docker
-  tenkins:
-    command: usr/bin/tocker_jenkins.sh
+  tenkins1:
+    command: usr/bin/tocker_jenkins1.sh
+    plugs:
+      - docker
+  tenkins2:
+    command: usr/bin/tocker_jenkins2.sh
     plugs:
       - docker
 

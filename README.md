@@ -162,7 +162,7 @@ volume. It's a pretty simple process!
 We will use two scripts that do all the heavy-lifting for us:
 
 ```
-$ cat src/usr/bin/tocker_jenkins.sh
+$ cat src/usr/bin/tocker_jenkins1.sh
 #!/bin/sh
 
 Export PATH=$SNAP/docker-bin/bin:$PATH
