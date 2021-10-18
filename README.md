@@ -154,5 +154,43 @@ navigate to http://localhost:8000, you should be greeted with the website hosted
 by our Docker container!
 
 
+### Using volumes
+
+Suppose we want to create two Jenkins instances which share data between a
+volume. It's a pretty simple process!
+
+We will use two scripts that do all the heavy-lifting for us:
+
+```
+$ cat src/usr/bin/tocker_jenkins.sh
+#!/bin/sh
+
+Export PATH=$SNAP/docker-bin/bin:$PATH
+
+Docker run --name tocker-jenkins1 \
+    -v jenkins-volume:/var/jenkins_home \
+    -p 8080:8080 -p 50000:50000 \
+    jenkins/jenkins
+
+$ cat src/usr/bin/tocker_jenkins2.sh
+#!/bin/sh
+
+Export PATH=$SNAP/docker-bin/bin:$PATH
+
+Docker run --name tocker-jenkins2 \
+    -v jenkins-volume:/var/jenkins_home \
+    -p 9090:9090 -p 60000:50000 \
+    jenkins/jenkins
+```
+
+After adding these scripts to our `snapcraft.yaml`, we can run the first script
+and go through the setup process. After, we can spin up the second instance and
+find that no setup is required; the setup data is shared in the volume we
+specified they use!
+
+We could make these Jenkins instances run as daemons if we wanted; this is left
+as an exercise.
+
+
 ___
 Currently under construction.
