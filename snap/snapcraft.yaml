@@ -1,6 +1,6 @@
 name: tocker
 base: core20
-version: '2.6'
+version: '3.0'
 summary: A test of interacting with the Docker snap through another snap
 description: |
   This snap moves a Docker-based workflow to a snap'd environment on Ubuntu
@@ -17,7 +17,7 @@ apps:
     plugs:
       - docker
   ticker:
-    command: usr/bin/tocker_compose.sh
+    command: usr/bin/tocker_ticker.sh
     daemon: simple
     plugs:
       - docker
@@ -27,6 +27,11 @@ apps:
       - docker
   tenkins2:
     command: usr/bin/tocker_jenkins2.sh
+    plugs:
+      - docker
+  tedgex:
+    command: usr/bin/tocker_edgex.sh
+    daemon: simple
     plugs:
       - docker
 

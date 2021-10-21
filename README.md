@@ -95,7 +95,7 @@ extend our snap a small amount:
 apps:
   {snip}
   ticker:
-      command: usr/bin/tocker_compose.sh
+      command: usr/bin/tocker_ticker.sh
       daemon: simple
       plugs:
         - docker
@@ -105,7 +105,7 @@ $ tree ./src
 ./src
 └── usr
     ├── bin
-    │   ├── tocker_compose.sh
+    │   ├── tocker_ticker.sh
     │   ├── tocker_run.sh
     └── share
         └── composers
@@ -115,14 +115,14 @@ $ tree ./src
 
 5 directories, 8 files
 
-$ cat src/usr/bin/tocker_compose.sh
+$ cat src/usr/bin/tocker_ticker.sh
 #!/bin/sh
 
 export PATH=$SNAP/docker-bin/bin:$PATH
 export PYTHONPATH=$SNAP/docker-bin/lib/python3.6/site-packages:$PYTHONPATH
 docker-compose -f $SNAP/usr/share/composers/hello-nginx.yml up
 
-$ cat src/usr/share/composers/docker-compose.yml
+$ cat src/usr/share/composers/nginx-compose.yml
 version: '3'
 
 services:
@@ -191,6 +191,42 @@ specified they use!
 We could make these Jenkins instances run as daemons if we wanted; this is left
 as an exercise.
 
+
+### Using EdgeX
+
+If you don't want to use the EdgeX snap already for available, you can use
+available `docker-compose.yml` files (or your own) to run EdgeX Foundry in a
+Docker Container similar to [the official
+documentation](https://docs.edgexfoundry.org/2.0/getting-started/Ch-GettingStartedUsers/),
+with some slight modification.
+
+To do this I've added a new simple daemon like our `ticker` example, along with
+a `docker-compose.yml` which I pulled from the [EdgeX Foundry GitHub, on the
+Ireland
+branch](https://github.com/edgexfoundry/edgex-compose/blob/ireland/docker-compose-no-secty.yml).
+The compose file will require a small tweak before it can be properly used
+within a snap. Because we want to use strict confinement, AppArmor will block
+our snap from functioning properly if we don't remove the
+```
+security_opt:
+  - no-new-privileges:true
+```
+lines from the compose file. Exclude these lines from the compose file you use,
+and theoretically there shouldn't be any problems in starting our service!
+
+Build & install the snap, and ensure you can see the services running and see
+the web interfaces:
+
+```
+$ sudo docker-compose ps
+$ curl http://localhost:59880/api/v2/ping
+$ curl http://localhost:8500/ui/dc1/services
+```
+
+You can see the logs for your service through `snap`:
+```
+$ sudo snap logs tocker.tedgex
+```
 
 ___
 Currently under construction.
