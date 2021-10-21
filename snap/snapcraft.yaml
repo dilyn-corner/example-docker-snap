@@ -14,26 +14,21 @@ confinement: strict
 apps:
   tocker:
     command: usr/bin/tocker_run.sh
-    plugs:
-      - docker
+    plugs: [docker]
   ticker:
     command: usr/bin/tocker_ticker.sh
     daemon: simple
-    plugs:
-      - docker
+    plugs: [docker]
   tenkins1:
     command: usr/bin/tocker_jenkins1.sh
-    plugs:
-      - docker
+    plugs: [docker]
   tenkins2:
     command: usr/bin/tocker_jenkins2.sh
-    plugs:
-      - docker
+    plugs: [docker]
   tedgex:
     command: usr/bin/tocker_edgex.sh
     daemon: simple
-    plugs:
-      - docker
+    plugs: [docker]
 
 parts:
   copy-script:

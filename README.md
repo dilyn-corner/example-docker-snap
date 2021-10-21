@@ -49,8 +49,7 @@ confinement: strict
 apps:
   tocker:
     command: usr/bin/tocker_run.sh
-    plugs:
-      - docker
+    plugs: [docker]
 
 parts:
   copy-script:
@@ -97,8 +96,7 @@ apps:
   ticker:
       command: usr/bin/tocker_ticker.sh
       daemon: simple
-      plugs:
-        - docker
+      plugs: [docker]
 
 Our src directory now looks like:
 $ tree ./src
