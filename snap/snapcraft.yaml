@@ -1,6 +1,6 @@
 name: tocker
 base: core20
-version: '3.0'
+version: '5.0'
 summary: A test of interacting with the Docker snap through another snap
 description: |
   This snap moves a Docker-based workflow to a snap'd environment on Ubuntu
@@ -11,32 +11,46 @@ description: |
 grade: stable
 confinement: strict
 
+environment:
+  DOCKER_CONFIG: $SNAP_COMMON/.docker
+  PATH:          $SNAP/docker-bin/bin:$PATH
+  PYTHONPATH:    $SNAP/docker-bin/lib/python3.6/site-packages:$PYTHONPATH
+
 apps:
+  rest:
+    command: usr/bin/tocker_rest.sh
+  secrets:
+    command: usr/bin/tocker_secrets.sh
+  jenkins1:
+    command: usr/bin/tocker_jenkins1.sh
+  jenkins2:
+    command: usr/bin/tocker_jenkins2.sh
   tocker:
     command: usr/bin/tocker_run.sh
-    plugs: [docker]
-  ticker:
-    command: usr/bin/tocker_ticker.sh
-    daemon: simple
-    plugs: [docker]
-  tenkins1:
-    command: usr/bin/tocker_jenkins1.sh
-    plugs: [docker]
-  tenkins2:
-    command: usr/bin/tocker_jenkins2.sh
-    plugs: [docker]
-  tedgex:
+  nginx:
+    command: usr/bin/tocker_nginx.sh
+    daemon:  simple
+  edgex:
     command: usr/bin/tocker_edgex.sh
-    daemon: simple
-    plugs: [docker]
+    daemon:  simple
 
 parts:
   copy-script:
     plugin: dump
     source: src/
+    build-packages: [docker.io]
+    stage-packages: [curl]
+    override-build: |
+      systemctl is-active -q docker || systemctl start docker
+      docker pull hello-world
+      docker save -o hello-world.docker hello-world
+      mkdir -p              $SNAPCRAFT_PART_INSTALL/usr/share/images
+      mv hello-world.docker $SNAPCRAFT_PART_INSTALL/usr/share/images
+      snapcraftctl build
 
 plugs:
+  docker:
   docker-executables:
     interface: content
-    content: executables
-    target: $SNAP/docker-bin
+    content:   executables
+    target:    $SNAP/docker-bin
